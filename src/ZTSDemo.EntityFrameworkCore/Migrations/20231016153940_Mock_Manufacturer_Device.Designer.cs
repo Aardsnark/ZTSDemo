@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 using ZTSDemo.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using ZTSDemo.EntityFrameworkCore;
 namespace ZTSDemo.Migrations
 {
     [DbContext(typeof(ZTSDemoDbContext))]
-    partial class ZTSDemoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231016153940_Mock_Manufacturer_Device")]
+    partial class MockManufacturerDevice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
