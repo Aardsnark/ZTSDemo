@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
-namespace ZTSDemo.Sims
+namespace ZTSDemo.DeviceSimContracts
 {
-    public class SimContract: Entity
+    public class DeviceSimContract: AggregateRoot<Guid>
     {
         public virtual Guid SimId { get; protected set; }
         public virtual Guid DeviceId { get; protected set; }
@@ -16,9 +16,10 @@ namespace ZTSDemo.Sims
 
 
 
-        protected SimContract() { }
+        protected DeviceSimContract() { }
 
-        public SimContract(Guid simID, Guid deviceID, Guid startDateId, Guid endDateId)
+        public DeviceSimContract(Guid id, Guid simID, Guid deviceID, Guid startDateId, Guid endDateId)
+            : base(id)
         {
             SimId = simID;
             DeviceId = deviceID;
@@ -26,10 +27,6 @@ namespace ZTSDemo.Sims
             EndDateId = endDateId;
         }
 
-        public override object[] GetKeys()
-        {
-            return new Object[] { SimId, DeviceId };
-        }
 
     }
 }

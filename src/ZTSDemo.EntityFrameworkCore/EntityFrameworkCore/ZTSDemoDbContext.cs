@@ -13,8 +13,12 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using ZTSDemo.Dates;
 using ZTSDemo.Devices;
+using ZTSDemo.DeviceSimContracts;
 using ZTSDemo.Manufacturers;
+using ZTSDemo.Providers;
+using ZTSDemo.Sims;
 
 namespace ZTSDemo.EntityFrameworkCore;
 
@@ -30,6 +34,12 @@ public class ZTSDemoDbContext :
 
     public DbSet<Manufacturer> Manufacturers { get; private set; }
     public DbSet<Device> Devices { get; private set; }
+    public DbSet<Date> Dates { get; private set; }
+
+    public DbSet<Sim> Sims {  get; private set; }
+    public DbSet<DeviceSimContract> SimContracs {  get; private set; }
+
+    public DbSet<Provider> Providers {  get; private set; }
 
 
 
@@ -56,6 +66,13 @@ public class ZTSDemoDbContext :
 
         /* Configure your own tables/entities inside here */
 
+        builder.Entity<Date>(d =>
+        {
+            d.ToTable(ZTSDemoConsts.DbTablePrefix + "Dates",
+                ZTSDemoConsts.DbSchema);
+            d.ConfigureByConvention();
+        });
+
         builder.Entity<Manufacturer>(ol =>
         {
             ol.ToTable(ZTSDemoConsts.DbTablePrefix + "Manufacturers",
@@ -69,6 +86,28 @@ public class ZTSDemoDbContext :
 
         });
 
+        builder.Entity<Provider>(ol =>
+        {
+            ol.ToTable(ZTSDemoConsts.DbTablePrefix + "Providers",
+                ZTSDemoConsts.DbSchema);
+            ol.ConfigureByConvention();
+            ol.Property(x => x.Name).IsRequired().HasMaxLength(64);
+            ol.Property(x => x.SimType).IsRequired().HasMaxLength(64);
+
+            // Define a unique index on the combination of Name and DeviceType
+            ol.HasIndex(x => new { x.Name, x.SimType }).IsUnique();
+
+        });
+
+        builder.Entity<Sim>(s =>
+        {
+            s.ToTable(ZTSDemoConsts.DbTablePrefix + "Sims",
+                ZTSDemoConsts.DbSchema);
+            s.ConfigureByConvention();
+
+            s.HasOne<Provider>().WithMany().HasForeignKey(x => x.ProviderId).IsRequired();
+        });
+
 
         builder.Entity<Device>(o =>
         {
@@ -79,6 +118,21 @@ public class ZTSDemoDbContext :
             o.HasOne<Manufacturer>().WithMany().HasForeignKey(x => x.ManufacturerId).IsRequired();
 
         });
+
+        builder.Entity<DeviceSimContract>(sc =>
+        {
+            sc.ToTable(ZTSDemoConsts.DbTablePrefix + "SimContracts",
+                ZTSDemoConsts.DbSchema);
+            sc.ConfigureByConvention();
+
+            sc.HasOne<Sim>().WithMany().HasForeignKey(x => x.SimId).IsRequired();
+            sc.HasOne<Device>().WithMany().HasForeignKey(x => x.DeviceId).IsRequired();
+            sc.HasOne<Date>().WithMany().HasForeignKey(x => x.StartDateId).IsRequired();
+            sc.HasOne<Date>().WithMany().HasForeignKey(x => x.EndDateId).IsRequired();
+
+            //index?
+        });
+
 
     }
 }
